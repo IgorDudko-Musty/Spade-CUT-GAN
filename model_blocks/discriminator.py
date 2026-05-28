@@ -6,17 +6,18 @@ class Discriminator(nn.Module):
         self,
         in_channels=1,
         out_channels=[64, 128, 256, 512, 1],
+        kernel_size=[4, 4, 4, 4, 4],
         strides=[2, 2, 2, 1, 1],
         prob=0.2,
     ):
         super().__init__()
         layers = []
-        for channel, stride in zip(out_channels, strides):
+        for channel, k, stride in zip(out_channels, kernel_size, strides):
             layers += [
                 nn.Conv2d(
                     in_channels=in_channels,
                     out_channels=channel,
-                    kernel_size=(4, 4),
+                    kernel_size=(k, k),
                     stride=stride,
                     padding=1,
                     padding_mode="zeros",

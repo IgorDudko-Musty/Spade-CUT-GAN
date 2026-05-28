@@ -1,0 +1,28 @@
+generator:
+  ds_in_ch: 3
+  ds_out_ch: [32, 64, 128, 256]
+  ds_kernels: [7, 3, 3, 3]
+  ds_strides: [1, 2, 2, 2]
+  feat_layers: [5, 8, 11]
+  sp_latent: 256
+  sp_cmap_in_ch: 3
+  sp_cmap_out_ch: [64, 128, 256]
+  sp_count: 6
+  up_in_channel: 256
+  out_out_channels: [128, 64, 32, 1]
+  up_kernels: [3, 3, 3, 3]
+  upsample_sizes: [2, 2, 2, 1]
+discriminator:
+  in_channels: 1
+  out_channels: [64, 128, 256, 512, 1]
+  kernel_size: [4, 4, 4, 4, 4]
+  strides: [2, 2, 2, 1, 1]
+  prob: 0.2
+patchnce:
+  mlp_in: [64, 128, 256]
+  mlp_out: 256
+patchnceLoss:
+  temperature: 0.07
+  patch_num: 480
+lambda_gan: 1.0
+lambda_nce: 1.0

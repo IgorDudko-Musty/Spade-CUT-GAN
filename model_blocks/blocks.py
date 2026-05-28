@@ -37,18 +37,22 @@ class DownsampleBlock(nn.Module):
 
 class UpsampleBlock(nn.Module):
     def __init__(
-        self, in_channel=128, out_channels=[64, 32, 1], k=3, upsample=[2, 2, 1]
+        self,
+        in_channel=128,
+        out_channels=[64, 32, 1],
+        kernel=[3, 3, 3],
+        upsample=[2, 2, 1],
     ):
         super().__init__()
         layers = []
-        for out_channel, up_smpl in zip(out_channels, upsample):
+        for out_channel, up_smpl, k in zip(out_channels, upsample, kernel):
             if up_smpl != 1:
                 layers.append(nn.Upsample(scale_factor=up_smpl, mode="nearest"))
             layers += [
                 nn.Conv2d(
                     in_channels=in_channel,
                     out_channels=out_channel,
-                    kernel_size=k,
+                    kernel_size=(k, k),
                     stride=1,
                     padding=k // 2,
                     padding_mode="reflect",
