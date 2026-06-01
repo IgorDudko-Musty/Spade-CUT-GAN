@@ -47,19 +47,30 @@ class UpsampleBlock(nn.Module):
         layers = []
         for out_channel, up_smpl, k in zip(out_channels, upsample, kernel):
             if up_smpl != 1:
-                layers.append(nn.Upsample(scale_factor=up_smpl, mode="nearest"))
-            layers += [
-                nn.Conv2d(
-                    in_channels=in_channel,
-                    out_channels=out_channel,
-                    kernel_size=(k, k),
-                    stride=1,
-                    padding=k // 2,
-                    padding_mode="reflect",
-                ),
-                nn.SiLU(),
-            ]
-
+                layers += [
+                    nn.Upsample(scale_factor=up_smpl, mode="nearest"),
+                    nn.Conv2d(
+                        in_channels=in_channel,
+                        out_channels=out_channel,
+                        kernel_size=(k, k),
+                        stride=1,
+                        padding=k // 2,
+                        padding_mode="reflect",
+                    ),
+                    nn.SiLU(),
+                ]
+            else:
+                layers += [
+                    nn.Conv2d(
+                        in_channels=in_channel,
+                        out_channels=out_channel,
+                        kernel_size=(k, k),
+                        stride=1,
+                        padding=k // 2,
+                        padding_mode="reflect",
+                    ),
+                    nn.Tanh(),
+                ]
             in_channel = out_channel
         self.layers = nn.Sequential(*layers)
 

@@ -11,9 +11,9 @@ class Discriminator(nn.Module):
         prob=0.2,
     ):
         super().__init__()
-        layers = []
+        self.discriminator = nn.ModuleList()
         for channel, k, stride in zip(out_channels, kernel_size, strides):
-            layers += [
+            block = [
                 nn.Conv2d(
                     in_channels=in_channels,
                     out_channels=channel,
@@ -24,16 +24,21 @@ class Discriminator(nn.Module):
                 )
             ]
             if in_channels == 1:
-                layers += [
+                block += [
                     nn.LeakyReLU(prob),
                 ]
             elif channel != 1:
-                layers += [
+                block += [
                     nn.InstanceNorm2d(channel),
                     nn.LeakyReLU(prob),
                 ]
+            self.discriminator.append(nn.Sequential(*block))
             in_channels = channel
-        self.discriminator = nn.Sequential(*layers)
 
     def forward(self, x):
-        return self.discriminator(x)
+        feats = []
+        for block in self.discriminator:
+            x = block(x)
+            feats.append(x)
+        prob_map = feats.pop(-1)
+        return prob_map, feats

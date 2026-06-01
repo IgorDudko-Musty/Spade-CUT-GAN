@@ -13,6 +13,7 @@ generator:
   up_kernels: [3, 3, 3, 3]
   upsample_sizes: [2, 2, 2, 1]
 discriminator:
+  amount: 3
   in_channels: 1
   out_channels: [64, 128, 256, 512, 1]
   kernel_size: [4, 4, 4, 4, 4]
@@ -26,3 +27,4 @@ patchnceLoss:
   patch_num: 480
 lambda_gan: 1.0
 lambda_nce: 1.0
+lambda_fm: 10.0

@@ -21,20 +21,32 @@ def train(
     num_workers=4,
     lr_G=2e-4,
     lr_D=2e-4,
-    device="cuda",
+    device="cpu",
 ):
 
     dataset = RGB2TIRData(data_path)
-    loader = DataLoader(dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers)
+    loader = DataLoader(
+        dataset, batch_size=batch_size, shuffle=False, num_workers=num_workers
+    )
 
     model = SpadeCUTGAN(config)
     model.train()
 
     opt_G = torch.optim.Adam(model.generator.parameters(), lr=lr_G, betas=(0.5, 0.999))
-    opt_D = torch.optim.Adam(model.discriminator.parameters(), lr=lr_D, betas=(0.5, 0.999))
+    opt_D = torch.optim.Adam(
+        model.discriminator.parameters(), lr=lr_D, betas=(0.5, 0.999)
+    )
 
-    scheduler_G = LambdaLR(opt_G, lr_lambda=lambda epoch: 1.0 - max(0, epoch - decay_start) / (epochs - decay_start))
-    scheduler_D = LambdaLR(opt_D, lr_lambda=lambda epoch: 1.0 - max(0, epoch - decay_start) / (epochs - decay_start))
+    scheduler_G = LambdaLR(
+        opt_G,
+        lr_lambda=lambda epoch: 1.0
+        - max(0, epoch - decay_start) / (epochs - decay_start),
+    )
+    scheduler_D = LambdaLR(
+        opt_D,
+        lr_lambda=lambda epoch: 1.0
+        - max(0, epoch - decay_start) / (epochs - decay_start),
+    )
 
     for epoch in range(1, epochs + 1):
 
@@ -56,7 +68,9 @@ def train(
             loss_G_tot.backward()
             scheduler_G.step()
 
-            pbar.set_postfix({"D": loss_D.item(), "G": loss_G.item(), "NCE": loss_PNCE.item()})
+            pbar.set_postfix(
+                {"D": loss_D.item(), "G": loss_G.item(), "NCE": loss_PNCE.item()}
+            )
         os.makedirs(model_save_path, exist_ok=True)
         torch.save(model.generator.state_dict(), f"checkpoints/epoch_{epoch}_G.pth")
         torch.save(model.discriminator.state_dict(), f"checkpoints/epoch_{epoch}_D.pth")
@@ -79,6 +93,18 @@ def train(
 
 
 if __name__ == "__main__":
+
+    model = SpadeCUTGAN(r"./config.yaml")
+
+    aaa = (torch.rand(1, 3, 640, 512, dtype=torch.float32) - 0.5) * 2
+    bbb = (torch.rand(1, 1, 640, 512, dtype=torch.float32) - 0.5) * 2
+
+    loss_D = model.forward_D(aaa, bbb)
+
+    loss_G_tot, loss_G, loss_PNCE, fm_loss, fake = model.forward_G(aaa, bbb)
+
+    a = 9
+
     train(
         data_path=r"/mnt/storage/datasets",
         model_save_path=r"",

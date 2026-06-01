@@ -57,7 +57,7 @@ class Generator(nn.Module):
 
     def forward(self, x, for_discriminator=False):
         if for_discriminator:
-            x = self.downsample(x)
+            latent = self.downsample(x)
             for block in self.spaderes:
                 latent = block(latent, x)
             thermal_image = self.upsample(latent)
